@@ -22,21 +22,21 @@ y_train, y_test = labels[:train_size], labels[train_size:]
 # Perform linear regression using the Normal Equation
 theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET'])
 def predict():
-    # Get the data from the POST request
-    data = request.get_json()
-    # Convert the data into a DataFrame
-    df = pd.DataFrame(data)
-    features = df.values
-    # Add a column of ones to features to account for the intercept term
-    features = np.c_[np.ones(features.shape[0]), features]
+    # Extract query parameters
+    feature1 = request.args.get('feature1', type=float)
+    feature2 = request.args.get('feature2', type=float)
+    feature3 = request.args.get('feature3', type=float)
+    
+    # Create a feature array
+    features = np.array([[1, feature1, feature2, feature3]])
+    
     # Make prediction
     prediction = features.dot(theta)
+    
     # Return the prediction as a JSON response
     return jsonify(prediction.tolist())
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
