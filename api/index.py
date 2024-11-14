@@ -22,12 +22,14 @@ y_train, y_test = labels[:train_size], labels[train_size:]
 # Perform linear regression using the Normal Equation
 theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 
-@app.route('/predict', methods=['GET'])
+@app.route('/predict', methods=['POST'])
 def predict():
-    # Extract query parameters
-    feature1 = request.args.get('feature1', type=float)
-    feature2 = request.args.get('feature2', type=float)
-    feature3 = request.args.get('feature3', type=float)
+    # Get the data from the POST request
+    data = request.json
+    # Extract the features
+    feature1 = data.get('feature1')
+    feature2 = data.get('feature2')
+    feature3 = data.get('feature3')
     
     # Create a feature array
     features = np.array([[1, feature1, feature2, feature3]])
