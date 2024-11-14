@@ -1,20 +1,26 @@
 from flask import Flask, request, jsonify
-import joblib
 import pandas as pd
-import gdown
+import numpy as np
 
 app = Flask(__name__)
 
-# Google Drive file ID
-file_id = '1yY2fmAuuzfelOZpJkMGzIL1PRLKiu6rs'
-url = f'https://drive.google.com/uc?id={file_id}'
+# Load the data
+data = pd.read_excel('C:/Users/VIP/Desktop/patients.xlsx')
 
-# Download the model file
-output = 'linear_regression_model.pkl'
-gdown.download(url, output, quiet=False)
+# Define features (input variables) and labels (output variable)
+features = data.iloc[:, :-1].values
+labels = data.iloc[:, -1].values
 
-# Load the trained model
-model = joblib.load(output)
+# Add a column of ones to features to account for the intercept term
+features = np.c_[np.ones(features.shape[0]), features]
+
+# Split the data into training and testing sets
+train_size = int(0.8 * features.shape[0])
+X_train, X_test = features[:train_size], features[train_size:]
+y_train, y_test = labels[:train_size], labels[train_size:]
+
+# Perform linear regression using the Normal Equation
+theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -22,11 +28,15 @@ def predict():
     data = request.get_json()
     # Convert the data into a DataFrame
     df = pd.DataFrame(data)
+    features = df.values
+    # Add a column of ones to features to account for the intercept term
+    features = np.c_[np.ones(features.shape[0]), features]
     # Make prediction
-    prediction = model.predict(df)
+    prediction = features.dot(theta)
     # Return the prediction as a JSON response
     return jsonify(prediction.tolist())
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
