@@ -5,7 +5,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Load the data
-data = pd.read_excel('C:/Users/VIP/Desktop/patients.xlsx')
+data = pd.read_excel('patients.xlsx')
 
 # Define features (input variables) and labels (output variable)
 features = data.iloc[:, :-1].values
