@@ -22,7 +22,7 @@ y_train, y_test = labels[:train_size], labels[train_size:]
 # Perform linear regression using the Normal Equation
 theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET'])
 def predict():
     # Get the data from the POST request
     data = request.json
