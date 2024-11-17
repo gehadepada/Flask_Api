@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 app = Flask(__name__)
-
+#linear regression by normal equation
 # Load the data
 data = pd.read_csv('patients.csv')
 
@@ -18,10 +18,36 @@ features = np.c_[np.ones(features.shape[0]), features]
 train_size = int(0.8 * features.shape[0])
 X_train, X_test = features[:train_size], features[train_size:]
 y_train, y_test = labels[:train_size], labels[train_size:]
-
-# Perform linear regression using the Normal Equation
 theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 
+
+#linear regression by gradient descent----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#data = pd.read_csv('patients.csv')
+#features = data.iloc[:, :-1].values
+#labels = data.iloc[:, -1].values
+#features = np.c_[np.ones(features.shape[0]), features]
+#train_size = int(0.8 * features.shape[0])
+#X_train, X_test = features[:train_size], features[train_size:]
+#y_train, y_test = labels[:train_size], labels[train_size:]
+# Initialize theta with zeros
+#theta = np.zeros(X_train.shape[1])  
+# Learning rate
+#alpha = 0.01 
+# Number of iterations
+#iterations = 1000  
+#def gradient_descent(X, y, theta, alpha, iterations):
+  #  m = len(y)
+    #cost_history = np.zeros(iterations)
+    
+   # for i in range(iterations):
+       # predictions = X.dot(theta)
+       # errors = predictions - y
+       # theta -= (alpha / m) * X.T.dot(errors)
+       # cost_history[i] = compute_cost(X, y, theta)
+    
+    #return theta, cost_history
+#theta, cost_history = gradient_descent(X_train, y_train, theta, alpha, iterations)
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/predict', methods=['GET'])
 def predict():
     # Extract query parameters
