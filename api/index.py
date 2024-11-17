@@ -35,6 +35,12 @@ theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 #alpha = 0.01 
 # Number of iterations
 #iterations = 1000  
+#def compute_cost(X, y, theta):
+   # m = len(y)
+   # predictions = X.dot(theta)
+   # cost = (1 / (2 * m)) * np.sum(np.square(predictions - y))
+   # return cost
+
 #def gradient_descent(X, y, theta, alpha, iterations):
   #  m = len(y)
     #cost_history = np.zeros(iterations)
