@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
 
@@ -10,9 +9,10 @@ data = pd.read_csv('patients.csv')
 features = data.iloc[:, :-1].values
 labels = data.iloc[:, -1].values
 
-# Standardize features
-scaler = StandardScaler()
-features_scaled = scaler.fit_transform(features)
+# Manual Standardization
+means = np.mean(features, axis=0)
+stds = np.std(features, axis=0)
+features_scaled = (features - means) / stds
 features_scaled = np.c_[np.ones(features_scaled.shape[0]), features_scaled]
 
 # Split into training and testing sets
@@ -58,8 +58,8 @@ def predict():
     # Create a feature array
     features = np.array([[feature1, feature2, feature3]])
     
-    # Standardize the input features
-    features_scaled = scaler.transform(features)
+    # Manual Standardization of input features
+    features_scaled = (features - means) / stds
     features_scaled = np.c_[np.ones(features_scaled.shape[0]), features_scaled]
     
     # Make prediction
