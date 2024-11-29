@@ -1,58 +1,52 @@
 from flask import Flask, request, jsonify
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
-#linear regression by normal equation
-# Load the data
-data = pd.read_csv('patients.csv')
 
-# Define features (input variables) and labels (output variable)
+# Linear regression by gradient descent--------------------------------------------------------------------------------------------------------------------------------------------------
+data = pd.read_csv('patients.csv')
 features = data.iloc[:, :-1].values
 labels = data.iloc[:, -1].values
 
-# Add a column of ones to features to account for the intercept term
-features = np.c_[np.ones(features.shape[0]), features]
+# Standardize features
+scaler = StandardScaler()
+features_scaled = scaler.fit_transform(features)
+features_scaled = np.c_[np.ones(features_scaled.shape[0]), features_scaled]
 
-# Split the data into training and testing sets
-train_size = int(0.8 * features.shape[0])
-X_train, X_test = features[:train_size], features[train_size:]
+# Split into training and testing sets
+train_size = int(0.8 * features_scaled.shape[0])
+X_train, X_test = features_scaled[:train_size], features_scaled[train_size:]
 y_train, y_test = labels[:train_size], labels[train_size:]
-theta = np.linalg.inv(X_train.T.dot(X_train)).dot(X_train.T).dot(y_train)
 
-
-#linear regression by gradient descent----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#data = pd.read_csv('patients.csv')
-#features = data.iloc[:, :-1].values
-#labels = data.iloc[:, -1].values
-#features = np.c_[np.ones(features.shape[0]), features]
-#train_size = int(0.8 * features.shape[0])
-#X_train, X_test = features[:train_size], features[train_size:]
-#y_train, y_test = labels[:train_size], labels[train_size:]
 # Initialize theta with zeros
-#theta = np.zeros(X_train.shape[1])  
+theta = np.zeros(X_train.shape[1])
 # Learning rate
-#alpha = 0.01 
+alpha = 0.01
 # Number of iterations
-#iterations = 1000  
-#def compute_cost(X, y, theta):
-   # m = len(y)
-   # predictions = X.dot(theta)
-   # cost = (1 / (2 * m)) * np.sum(np.square(predictions - y))
-   # return cost
+iterations = 1000
 
-#def gradient_descent(X, y, theta, alpha, iterations):
-  #  m = len(y)
-    #cost_history = np.zeros(iterations)
+def compute_cost(X, y, theta):
+    m = len(y)
+    predictions = X.dot(theta)
+    cost = (1 / (2 * m)) * np.sum(np.square(predictions - y))
+    return cost
+
+def gradient_descent(X, y, theta, alpha, iterations):
+    m = len(y)
+    cost_history = np.zeros(iterations)
     
-   # for i in range(iterations):
-       # predictions = X.dot(theta)
-       # errors = predictions - y
-       # theta -= (alpha / m) * X.T.dot(errors)
-       # cost_history[i] = compute_cost(X, y, theta)
+    for i in range(iterations):
+        predictions = X.dot(theta)
+        errors = predictions - y
+        theta -= (alpha / m) * X.T.dot(errors)
+        cost_history[i] = compute_cost(X, y, theta)
     
-    #return theta, cost_history
-#theta, cost_history = gradient_descent(X_train, y_train, theta, alpha, iterations)
+    return theta, cost_history
+
+theta, cost_history = gradient_descent(X_train, y_train, theta, alpha, iterations)
+
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @app.route('/predict', methods=['GET'])
 def predict():
@@ -62,10 +56,14 @@ def predict():
     feature3 = request.args.get('feature3', type=float)
     
     # Create a feature array
-    features = np.array([[1, feature1, feature2, feature3]])
+    features = np.array([[feature1, feature2, feature3]])
+    
+    # Standardize the input features
+    features_scaled = scaler.transform(features)
+    features_scaled = np.c_[np.ones(features_scaled.shape[0]), features_scaled]
     
     # Make prediction
-    prediction = features.dot(theta)
+    prediction = features_scaled.dot(theta)
     
     # Return the prediction as a JSON response
     return jsonify(prediction.tolist())
