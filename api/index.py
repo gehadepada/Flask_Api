@@ -6,8 +6,8 @@ app = Flask(__name__)
 
 # Load and prepare the data
 data = pd.read_csv('patients.csv')
-features = data.iloc[:, :-1].values
-labels = data.iloc[:, -1].values
+features = data.iloc[:, :-1]
+labels = data.iloc[:, -1]
 
 # Add a column of ones for the intercept term
 features = np.c_[np.ones(features.shape[0]), features]
